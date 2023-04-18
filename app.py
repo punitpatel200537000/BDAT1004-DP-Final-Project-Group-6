@@ -1,6 +1,8 @@
 from flask import Flask, render_template
 from pymongo import MongoClient
 import requests
+from datetime import datetime, time
+from pytz import timezone
 from apscheduler.schedulers.background import BackgroundScheduler
 
 app = Flask(__name__)
@@ -41,8 +43,11 @@ def ozone():
     # render the value in an HTML template
     return render_template("ozone-chart.html", data=data)
 
+# define the timezone you want to use
+tz = timezone('America/Toronto')
+
 # create a scheduler object
-scheduler = BackgroundScheduler()
+scheduler = BackgroundScheduler(timezone=tz)
 
 # define the task to be scheduled
 def collection_update():
@@ -61,11 +66,10 @@ def collection_update():
     data = response.json()
 
     # insert data into MongoDB collection
-    for entry in data:
-        collection.insert_one(entry)
+    collection.insert_one(data)
 
 # add the task to the scheduler
-scheduler.add_job(collection_update, 'interval', hours=24)
+scheduler.add_job(collection_update, 'interval', hours=24, start_date=datetime.combine(datetime.now(tz).date(), time(hour=0, minute=0, second=0, microsecond=0)))
 
 # start the scheduler
 scheduler.start()
