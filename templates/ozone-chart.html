@@ -112,8 +112,8 @@
       var data = google.visualization.arrayToDataTable([
         ["Date", "Ozone"],
         {% for i in range(0, 10) %}
-    ['{{ data[i]["datetime"] }}', {{ data[i]["ozone"] }},],
-      {% endfor %}
+          ['{{ data[i]["datetime"] }}', {{ data[i]["ozone"] }},],
+        {% endfor %}
         ]);
 
     var options = {
